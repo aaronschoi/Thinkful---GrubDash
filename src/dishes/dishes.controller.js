@@ -7,3 +7,30 @@ const dishes = require(path.resolve("src/data/dishes-data"));
 const nextId = require("../utils/nextId");
 
 // TODO: Implement the /dishes handlers needed to make the tests pass
+const create = (req, res, next) => {
+
+};
+
+const read = (req, res, next) => {
+
+};
+
+const update = (req, res, next) => {
+
+};
+
+const destroy = (req, res, next) => {
+
+};
+
+const list = (req, res, next) => {
+    res.json({ data : dishes })
+};
+
+module.exports = {
+    create: [],
+    read: [],
+    update: [],
+    delete: [],
+    list: [list]
+}
