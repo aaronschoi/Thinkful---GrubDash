@@ -52,7 +52,7 @@ const postHasDishesWithQuantities = (req, res, next) => {
     const { data : { dishes } = {} } = req.body;
     for(const [index, dish] of dishes.entries()){
         if(dish.quantity && dish.quantity > 0 && Number.isInteger(dish.quantity)){
-            console.log(`dish at index ${index} passes the quantity test`)
+            //console.log(`dish at index ${index} passes the quantity test`)
         }
         else{
             return next({
@@ -61,7 +61,7 @@ const postHasDishesWithQuantities = (req, res, next) => {
             })
         }
     }
-    console.log("all dishes passed this test")
+    //console.log("all dishes passed this test")
     return next();
 };
 //------------------
@@ -77,7 +77,7 @@ const orderIdExists = (req, res, next) => {
     else{
         return next({
             status: 404,
-            message: "no matches found"
+            message: `no order matched: ${orderId}`
         })
     }
 };
@@ -123,6 +123,22 @@ const updateStatusCheck = (req, res, next) => {
 };
 //-----------------------
 
+//DELETE/delete /order/:orderId
+const destroyStatusCheck = (req, res, next) => {
+    const { orderId } = req.params;
+    const foundId = orders.find(order => order.id === orderId);
+    if(foundId.status === "pending"){
+        return next();
+    }
+    else{
+        return next({
+            status: 400,
+            message: "An order cannot be deleted unless it is pending"
+        })
+    }
+};
+//---------------
+
 //CRUDL Functions:
 const create = (req, res, next) => {
     const { data : { deliverTo, mobileNumber, status, dishes } = {} } = req.body;
@@ -157,7 +173,10 @@ const update = (req, res, next) => {
 };
 
 const destroy = (req, res, next) => {
-
+    const { orderId } = req.params;
+    const idToBeDeleted = orders.findIndex(order => order.id === orderId);
+    orders.splice(idToBeDeleted, 1);
+    return res.sendStatus(204);
 };
 
 const list = (req, res, next) => {
@@ -168,6 +187,6 @@ module.exports = {
     create: [postHasDeliverTo, postHasMobileNumber, postHasDishes, postHasDishesWithQuantities, create],
     read: [orderIdExists, read],
     update: [orderIdExists, orderIdMatchesBodyId, postHasDeliverTo, postHasMobileNumber, postHasDishes, postHasDishesWithQuantities, updateStatusCheck, update],
-    destory: [],
+    delete: [orderIdExists, destroyStatusCheck, destroy],
     list
 }
