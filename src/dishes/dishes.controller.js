@@ -68,6 +68,25 @@ const postHasImage = (req, res, next) => {
 };
 //-------------------------
 
+//GET:read request for /:dishId
+const idExists = (req, res, next) => {
+    const { dishId } = req.params;
+    const foundId = dishes.find(dish => dish.id === dishId);
+    if(foundId){
+        res.locals.dishes = foundId;
+        next();
+    }
+    else{
+        next({
+            status: 404,
+            message: "no match is found"
+        })
+    }
+
+};
+
+//------------------------------
+
 //CRUDL functions
 const create = (req, res, next) => {
     const { data : { name, description, price, image_url } = {} } = req.body;
@@ -84,7 +103,7 @@ const create = (req, res, next) => {
 };
 
 const read = (req, res, next) => {
-
+    res.json({ data : res.locals.dishes })
 };
 
 const update = (req, res, next) => {
@@ -101,7 +120,7 @@ const list = (req, res, next) => {
 
 module.exports = {
     create: [postHasName, postHasDescription, postHasPrice, postHasImage, create],
-    read: [],
+    read: [idExists, read],
     update: [],
     delete: [],
     list: [list]
