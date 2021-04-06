@@ -83,6 +83,46 @@ const orderIdExists = (req, res, next) => {
 };
 //----------------------
 
+//PUT/update /orders/:orderId
+const orderIdMatchesBodyId = (req, res, next) => {
+    const { data : { id } = {} } = req.body;
+    const { orderId } = req.params;
+    if(id){
+    if(orderId === id){
+        return next();
+    }
+    else{
+        return next({
+            status: 400,
+            message: `Order id does not match route id. Order: ${id}, Router ${orderId}.`
+        })
+    }}
+    return next();
+};
+
+const updateStatusCheck = (req, res, next) => {
+    const { data: { status } = {} } = req.body;
+    const statusValidator = status === "pending" || status === "preparing" || status === "out-for-delivery" || status === "delivered"
+    if(statusValidator){
+        if(status === "delivered"){
+            return next({
+                status: 400,
+                message: "A delivered order cannot be changed"
+            })
+        }
+        else{
+            return next();
+        }
+    }
+    else{
+        return next({
+            status: 400,
+            message: "Order must have a status of pending, preparing, out-for-delivery, delivered"
+        })
+    }
+};
+//-----------------------
+
 //CRUDL Functions:
 const create = (req, res, next) => {
     const { data : { deliverTo, mobileNumber, status, dishes } = {} } = req.body;
@@ -103,7 +143,17 @@ const read = (req, res, next) => {
 };
 
 const update = (req, res, next) => {
-
+    const { data : { deliverTo, mobileNumber, status, dishes } = {} } = req.body;
+    const { orderId } = req.params;
+    const indexOfOrder = orders.findIndex(order => order.id === orderId);
+    orders[indexOfOrder] = {
+        ...orders[indexOfOrder],
+        deliverTo,
+        mobileNumber,
+        status,
+        dishes
+    };
+    res.status(200).json({ data : orders[indexOfOrder] })
 };
 
 const destroy = (req, res, next) => {
@@ -117,7 +167,7 @@ const list = (req, res, next) => {
 module.exports = {
     create: [postHasDeliverTo, postHasMobileNumber, postHasDishes, postHasDishesWithQuantities, create],
     read: [orderIdExists, read],
-    update: [],
+    update: [orderIdExists, orderIdMatchesBodyId, postHasDeliverTo, postHasMobileNumber, postHasDishes, postHasDishesWithQuantities, updateStatusCheck, update],
     destory: [],
     list
 }
