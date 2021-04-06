@@ -142,7 +142,7 @@ const destroy = (req, res, next) => {
 };
 
 const list = (req, res, next) => {
-    res.status(201).json({ data : dishes })
+    res.status(200).json({ data : dishes })
 };
 
 module.exports = {

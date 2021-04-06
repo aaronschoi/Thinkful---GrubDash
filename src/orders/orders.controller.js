@@ -7,3 +7,32 @@ const orders = require(path.resolve("src/data/orders-data"));
 const nextId = require("../utils/nextId");
 
 // TODO: Implement the /orders handlers needed to make the tests pass
+
+//CRUDL Functions:
+const create = (req, res, next) => {
+
+};
+
+const read = (req, res, next) => {
+
+};
+
+const update = (req, res, next) => {
+
+};
+
+const destroy = (req, res, next) => {
+
+};
+
+const list = (req, res, next) => {
+    res.status(200).json({ data : orders })
+};
+
+module.exports = {
+    create: [],
+    read: [],
+    update: [],
+    destory: [],
+    list
+}
