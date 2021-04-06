@@ -66,6 +66,23 @@ const postHasDishesWithQuantities = (req, res, next) => {
 };
 //------------------
 
+//GET/read for /orders/:orderId
+const orderIdExists = (req, res, next) => {
+    const { orderId } = req.params;
+    const foundId = orders.find(order => order.id === orderId);
+    if(foundId){
+        res.locals.orders = foundId;
+        return next();
+    }
+    else{
+        return next({
+            status: 404,
+            message: "no matches found"
+        })
+    }
+};
+//----------------------
+
 //CRUDL Functions:
 const create = (req, res, next) => {
     const { data : { deliverTo, mobileNumber, status, dishes } = {} } = req.body;
@@ -82,7 +99,7 @@ const create = (req, res, next) => {
 };
 
 const read = (req, res, next) => {
-
+    res.status(200).json({ data : res.locals.orders })
 };
 
 const update = (req, res, next) => {
@@ -99,7 +116,7 @@ const list = (req, res, next) => {
 
 module.exports = {
     create: [postHasDeliverTo, postHasMobileNumber, postHasDishes, postHasDishesWithQuantities, create],
-    read: [],
+    read: [orderIdExists, read],
     update: [],
     destory: [],
     list
